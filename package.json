@@ -8,10 +8,18 @@
     "dev": "nodemon src/server.js",
     "vercel:dev": "vercel dev"
   },
-  "keywords": ["pos", "line", "messaging-api", "sme", "vercel", "serverless"],
+  "keywords": [
+    "pos",
+    "line",
+    "messaging-api",
+    "sme",
+    "vercel",
+    "serverless"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@supabase/supabase-js": "^2.105.3",
     "axios": "^1.7.0",
     "pg": "^8.11.3",
     "raw-body": "^2.5.2"
