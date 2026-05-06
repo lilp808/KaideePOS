@@ -1,0 +1,23 @@
+{
+  "name": "line-pos-system",
+  "version": "2.0.0",
+  "description": "Chat-based POS system using LINE Messaging API (Vercel Serverless)",
+  "main": "api/webhook.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "vercel:dev": "vercel dev"
+  },
+  "keywords": ["pos", "line", "messaging-api", "sme", "vercel", "serverless"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.0",
+    "pg": "^8.11.3",
+    "raw-body": "^2.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "vercel": "^34.0.0"
+  }
+}

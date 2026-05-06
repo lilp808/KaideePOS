@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "functions": {
+    "api/webhook.js": {
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/webhook",
+      "dest": "/api/webhook.js"
+    },
+    {
+      "src": "/",
+      "dest": "/api/health.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
