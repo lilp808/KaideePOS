@@ -523,14 +523,18 @@ async function handleFollow(event) {
     
     if (isNew) {
       console.log(`[FOLLOW] New user created: ${lineUserId}`);
-      
-      const welcomeMsg = buildWelcomeMessage();
-      await replyMessage(event.replyToken, welcomeMsg);
-      
-      const menus = await orderService.getUserMenus(userId);
-      const menuMsg = buildMenuFlexMessage(menus);
-      await pushMessage(lineUserId, menuMsg);
+    } else {
+      console.log(`[FOLLOW] Existing user re-followed: ${lineUserId}`);
     }
+    
+    // Send welcome message on every follow (including block/unblock)
+    const welcomeMsg = buildWelcomeMessage();
+    await replyMessage(event.replyToken, welcomeMsg);
+    
+    // Send menu
+    const menus = await orderService.getUserMenus(userId);
+    const menuMsg = buildMenuFlexMessage(menus);
+    await pushMessage(lineUserId, menuMsg);
   } catch (error) {
     console.error('[FOLLOW] Error:', error);
     throw error;
