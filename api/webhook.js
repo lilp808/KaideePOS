@@ -2,6 +2,7 @@ const getRawBody = require('raw-body');
 const crypto = require('crypto');
 const axios = require('axios');
 const orderService = require('../src/services/orderService');
+const { isRateLimited, getRemainingTime } = require('../src/services/rateLimiter');
 
 // Disable body parsing to get raw body for signature verification
 export const config = {
@@ -557,6 +558,15 @@ async function handleMessage(event) {
   
   console.log('[MESSAGE] Received text:', text);
   console.log('[MESSAGE] User ID:', lineUserId);
+  
+  // Check rate limiting
+  if (isRateLimited(lineUserId)) {
+    const remainingTime = getRemainingTime(lineUserId);
+    console.log('[MESSAGE] Rate limited user:', lineUserId, 'Remaining ms:', remainingTime);
+    
+    // Don't reply to rate limited messages to avoid spam
+    return;
+  }
   
   try {
     // Simple fallback response for now - ensure bot always replies
