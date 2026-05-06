@@ -570,9 +570,11 @@ async function handleFollow(event) {
 async function handleMessage(event) {
   const lineUserId = event.source.userId;
   const text = event.message.text.trim();
+  const replyToken = event.replyToken;
   
   console.log('[MESSAGE] Received text:', text);
   console.log('[MESSAGE] User ID:', lineUserId);
+  console.log('[MESSAGE] Reply Token:', replyToken);
   
   // Check rate limiting
   if (isRateLimited(lineUserId)) {
@@ -583,25 +585,37 @@ async function handleMessage(event) {
     return;
   }
   
+  console.log('[MESSAGE] Rate limit check passed');
+  
   try {
+    console.log('[MESSAGE] Attempting to send reply...');
+    
     // Simple fallback response for now - ensure bot always replies
-    await replyMessage(event.replyToken, {
+    const replyData = await replyMessage(replyToken, {
       type: 'text',
       text: `สวัสดี! รับทราบข้อความ: "${text}"`
     });
     
-    // TODO: Add full functionality later
-    // For now, just acknowledge the message
+    console.log('[MESSAGE] Reply sent successfully:', replyData);
+    console.log('[MESSAGE] Message processing completed');
     
   } catch (error) {
     console.error('[MESSAGE] Error:', error);
+    console.error('[MESSAGE] Error details:', {
+      message: error.message,
+      code: error.code,
+      status: error.response?.status,
+      data: error.response?.data
+    });
     
     // Always try to send a fallback message
     try {
-      await replyMessage(event.replyToken, {
+      console.log('[MESSAGE] Sending fallback message...');
+      await replyMessage(replyToken, {
         type: 'text',
         text: 'ขออภัย ระบบขัดข้อผิดพลาด กรุณาลองใหม่'
       });
+      console.log('[MESSAGE] Fallback message sent');
     } catch (replyError) {
       console.error('[MESSAGE] Reply failed:', replyError);
     }
