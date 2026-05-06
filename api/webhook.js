@@ -537,6 +537,16 @@ async function handleFollow(event) {
     await pushMessage(lineUserId, menuMsg);
   } catch (error) {
     console.error('[FOLLOW] Error:', error);
+    
+    // Send fallback message on database error
+    if (error.message?.includes('Connection') || error.message?.includes('timeout')) {
+      await replyMessage(event.replyToken, {
+        type: 'text',
+        text: 'ระบบกำลังประมวลผล กรุณารอสักครู่แล้วลองใหม่'
+      });
+      return; // Don't throw error for connection issues
+    }
+    
     throw error;
   }
 }
@@ -584,6 +594,16 @@ async function handleMessage(event) {
     
   } catch (error) {
     console.error('[MESSAGE] Error:', error);
+    
+    // Send fallback message on database error
+    if (error.message?.includes('Connection') || error.message?.includes('timeout')) {
+      await replyMessage(event.replyToken, {
+        type: 'text',
+        text: 'ระบบกำลังประมวลผล กรุณารอสักครู่แล้วลองใหม่'
+      });
+      return;
+    }
+    
     throw error;
   }
 }
@@ -628,9 +648,16 @@ async function handlePostback(event) {
     }
   } catch (error) {
     console.error('[POSTBACK] Error:', error);
+    
+    // Send appropriate error message based on error type
+    let errorMessage = 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
+    if (error.message?.includes('Connection') || error.message?.includes('timeout')) {
+      errorMessage = 'ระบบกำลังประมวลผล กรุณารอสักครู่แล้วลองใหม่';
+    }
+    
     await replyMessage(event.replyToken, {
       type: 'text',
-      text: 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง'
+      text: errorMessage
     });
   }
 }
