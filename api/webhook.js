@@ -18,25 +18,40 @@ const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET;
 // LINE API Helper
 // ============================================
 
-async function lineApiRequest(method, endpoint, data = null) {
+async function lineApiRequest(method, endpoint, data = null, retries = 2) {
   const url = `https://api.line.me/v2/bot${endpoint}`;
   const headers = {
     'Authorization': `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`,
     'Content-Type': 'application/json',
   };
 
-  try {
-    const response = await axios({
-      method,
-      url,
-      headers,
-      data,
-      timeout: 10000,
-    });
-    return response.data;
-  } catch (error) {
-    console.error(`LINE API Error (${endpoint}):`, error.response?.data || error.message);
-    throw error;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await axios({
+        method,
+        url,
+        headers,
+        data,
+        timeout: 20000, // Increase timeout to 20 seconds
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`LINE API Error (${endpoint}) - Attempt ${attempt + 1}:`, error.response?.data || error.message);
+      
+      // Don't retry on client errors (4xx)
+      if (error.response?.status >= 400 && error.response?.status < 500) {
+        throw error;
+      }
+      
+      // If this is the last attempt, throw the error
+      if (attempt === retries) {
+        throw error;
+      }
+      
+      // Wait before retrying (exponential backoff)
+      const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
   }
 }
 
